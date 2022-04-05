@@ -1,0 +1,50 @@
+.link_btn{
+    width: 50px;
+}
+
+.link_list{
+    height: 48.2%;
+    /* overflow:auto; */
+    margin-bottom: 8px;
+}
+.inter_icon{
+    height: 20px;
+    margin-right: 5px;
+}
+.link_div_column{
+    width: 90px;
+    height: 100%;
+    display:inline-block;
+    font-size: 20px;
+    /* border-right-width: 2px;
+    border-right-style: solid;
+    border-right-color:#e9e3e3 */
+}
+.link_div_item{
+    width: 150px;
+    height: 100%;
+    display:inline-block;
+    text-align:center;
+    font-size: 20px;
+    padding: 3px;
+    border-right-width: 2px;
+    border-right-style: solid;
+    border-right-color:#e9e3e3
+}
+.link_div_small{
+    height: 44px;
+    text-align:center;
+    line-height:44px;
+    padding-right: 5px;
+    color: black;!important;
+    /* color: rgb(144, 147, 153); */
+}
+.link_div_large{
+    height: 130px;
+    text-align:center;
+    line-height:130px;
+    padding-right: 5px;
+    color: black;!important;
+    /* color: rgb(144, 147, 153); */
+
+}

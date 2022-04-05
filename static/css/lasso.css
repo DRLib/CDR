@@ -1,0 +1,45 @@
+circle {
+    fill-opacity: 0.5;
+}
+
+.lasso path {
+    stroke: rgb(80,80,80);
+    stroke-width:2px;
+}
+
+.lasso .drawn {
+    fill-opacity:.05 ;
+}
+
+.lasso .loop_close {
+    fill:none;
+    stroke-dasharray: 4,4;
+}
+
+.lasso .origin {
+    fill:#3399FF;
+    fill-opacity:.5;
+}
+
+.point_not_possible {
+    fill: rgb(200,200,200);
+}
+
+.point_possible {
+    fill: #FFBF00;
+}
+/* 和node_link中yellow保持一致 */
+.point_selected {
+    fill: #FFBF00;
+}
+
+.image_selected{
+    opacity: 1;
+}
+
+.image_possible{
+    opacity: 0.75;
+}
+.image_not_possible{
+    opacity: 0.5;
+}

@@ -1,0 +1,66 @@
+#project_view{
+    position: absolute;
+    height: 91%;
+    width: 100%;
+}
+
+.project_component_area{
+    height: 45px;
+    padding: 7px 10px 7px 10px;
+    background-color: #f6f6f6;
+}
+.project_button{
+    color: #409EFF;
+    background: #ecf5ff;
+    font-size:16px;
+    height: 30px;
+    font-weight:bold;
+    border-radius:3px;
+    padding: 0px 8px 0px 5px;
+    display: inline-block;
+    float: left;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid #b3d8ff;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: 0;
+    margin-left: 5px;
+    transition: .1s;
+    font-weight: 500;
+}
+.button_selected{
+    background: #409EFF;
+    border-color: #409EFF;
+    color: #FFF;
+}
+.button_not_selected{
+    color: #409EFF;
+    background: #ecf5ff;
+    border-color: #b3d8ff;
+}
+.tooltip{
+    font-size:10px;
+    height:auto;
+    position:absolute; 
+    text-align:center;
+    border-style:solid;
+    border-width:1px;
+    background-color:white;
+    border-radius:5px;	
+    padding-left:2px;
+    padding-right:2px;
+}
+
+.thick-green-border {
+    width: 100px; 
+    margin-top: 40px;
+    margin-left: 40px;
+    margin-bottom: -10px;
+    margin-right: 20px;
+    padding-top: 20px;
+    border-style: solid;
+    border-width: 10px;
+    border-color: green;
+} 

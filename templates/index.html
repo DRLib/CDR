@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive CDR</title>
+    <script src="static/js/common/d3.v5.min.js" charset="utf-8"></script>
+    <script src="static/js/common/jquery.min.js"></script>
+    <script src="static/js/common/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+{#    <link rel="stylesheet" href="static/css/common/bootstrap.min.css" crossorigin="anonymous">#}
+{#    <link rel="stylesheet" href="static/css/common/eu_index.css">#}
+
+    <link type="text/css" rel="styleSheet" href="static/css/container.css"/>
+    <link type="text/css" rel="styleSheet" href="static/css/control.css"/>
+    <link type="text/css" rel="styleSheet" href="static/css/project_view.css"/>
+    <link type="text/css" rel="styleSheet" href="static/css/link_view.css"/>
+    <link type="text/css" rel="styleSheet" href="static/css/lasso.css"/>
+    <link type="text/css" rel="styleSheet" href="static/css/myCss.css"/>
+
+    <script src="static/js/common/vue.js"></script>
+    <script src="static/js/common/d3-lasso.min.js"></script>
+    <script src="static/js/common/eu_index.js"></script>
+    <script src="static\js\models\path.js"></script>
+</head>
+<body>
+
+<div id="container" class="container-fluid">
+    <div class="row">
+        <div id="control_container" class="col-lg-2 panel panel-info container_up" style="width: 24%;">
+            <div class="title">CONTROL BOARD</div>
+            <div id="control_div_content">
+                <div id="data_info" class="control_div">
+                    <div class="row panel panel-info">
+                        <div class="panel-heading sub_head"><h3 class="panel-title panel_title_info">Dataset Selection</h3></div>
+                        <div class="col-lg-12 panel_content" style="padding: 20px 20px 0 10px">
+                            <template>
+                                <el-select v-model="selected_dataset_name" style="width: 100%;font-size: 24px" placeholder="select dataset"
+                                           @change="change_dataset">
+                                    <el-option
+                                            v-for="(dataset,index) in dataset_list"
+                                            :value="dataset.name">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                            <div class="col-lg-4 ds_info">num:
+                                <span id="ds_scale" v-bind:num="selected_dataset_num" v-bind:dim="selected_dataset_dim">
+                                    {{ selected_dataset_num }}
+                                </span>
+                            </div>
+                            <div class="col-lg-4 ds_info">dim:
+                                <span id="ds_scale" v-bind:num="selected_dataset_num" v-bind:dim="selected_dataset_dim">
+                                    {{ selected_dataset_dim }}
+                                </span>
+                            </div>
+                            <div class="col-lg-4 ds_info">type:
+                                <span id="ds_cate" v-bind:num="selected_dataset_type">
+                                    {{ selected_dataset_type }}
+                                </span>
+                            </div>
+                        </div>
+                    </div><!-- /.row -->
+                </div>
+                <div id="train_para_info" class="control_div">
+                    <div class="row panel panel-info panel_content">
+                        <div class="panel-heading sub_head" style="border: 0;">
+                            <h3 class="panel-title panel_title_info">Training Parameters</h3>
+                        </div>
+                        <div is="train-para-item"
+                             v-for="(para,index) in train_para"
+                             v-bind:key="index"
+                             v-bind:parameter="para"
+                             v-bind:projected_state="projected_state"
+                        >
+                        </div>
+                    </div>
+                </div>
+                <div id="project_para_info" class="control_div">
+                    <div class="row panel panel-info panel_content">
+                        <div class="panel-heading sub_head"><h3 class="panel-title panel_title_info">Projecting Parameters</h3>
+                        </div>
+                        <div is="project-para-item"
+                             v-for="(para,index) in project_para"
+                             v-bind:key="index"
+                             v-bind:parameter="para">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="project_container" class="col-lg-6 panel panel-info container_up" style="width: 40%;">
+            <div class="title">PROJECTION VIEW</div>
+            <div class="project_component_area">
+                <div style="float: left;">
+                    <el-switch
+                            v-model="picture_state"
+                            active-text="Picture"
+                            active-color="#4fa1d9"
+                            inacitve-color="lightgray"
+                            inactive-text="Point"
+                            @change="change_picture"
+                            :disabled="judge_point"
+                            style="height: 30px;font-size: 16px;"
+                    >
+                    </el-switch>
+                    <el-button type="primary" class="control_btn" v-on:click="project()"
+                               style="background-color: #347dc3;border-color: #347dc3">Projection
+                    </el-button>
+                </div>
+                <div style="float: right;height: 31px;">
+                    <!-- <i class="el-icon-plus" style="font-size: 20px;margin-top: 4px;float: left"></i> -->
+                    <button class="project_button"
+                            v-bind:class="mustlink_class"
+                            id="must_button"
+                            v-on:click="change_mustlink_state()">
+                        <img src="static/icon/mustlink.png" height="20" width="20">
+                        <span>add Must-link</span>
+                    </button>
+                    <button class="project_button"
+                            v-bind:class="cannotlink_class"
+                            id="cannot_button"
+                            v-on:click="change_cannotlink_state()">
+                        <img src="static/icon/cannotlink2.png" height="20" width="20">
+                        <span>add Cannot-link</span>
+                    </button>
+                </div>
+            </div>
+            <div class="view" style="position: relative;float: left;">
+                <div id="project_view">
+                    <svg id="project_view_scatter"></svg>
+                </div>
+            </div>
+        </div>
+        <div id="link_container" class="col-lg-4 panel panel-info container_up" style="width: 36%;">
+            <div class="title">LINK BOARD</div>
+            <div class="control_div" style="height: 95%;">
+                <div class="row panel panel-info link_list panel_content">
+                    <div class="panel-heading sub_head"><h3 class="panel-title panel_title_info">Must Link List</h3></div>
+                    <div style="margin: 5px;height: 87%;overflow-x:scroll;white-space: nowrap">
+                        <div class="link_div_column">
+                            <div class="link_div_small link_head">ID</div>
+                            <div class="link_div_large link_head">Thumbnail</div>
+                            <div class="link_div_small link_head">Pair</div>
+                            <div class="link_div_small link_head">Active</div>
+                            <div class="link_div_small link_head">Delete</div>
+                        </div>
+                        <div is="link-item"
+                             v-for="(link,index) in mustlink_list"
+                             v-bind:key="link.id"
+                             v-bind:link="link"
+                             v-on:remove="remove(link,index,'must')"
+                             v-on:change="change(link)"
+                             v-on:over="mouseOver(link)"
+                             v-on:leave="mouseLeave(link)"
+                             v-on:active_change="active_change(link)">
+                        </div>
+                    </div>
+                </div>
+                <div class="row panel panel-info link_list panel_content">
+                    <div class="panel-heading sub_head"><h3 class="panel-title panel_title_info">Cannot Link List</h3></div>
+                    <div style="margin: 5px;height: 87%;overflow-x:scroll;white-space: nowrap">
+                        <div class="link_div_column">
+                            <div class="link_div_small">ID</div>
+                            <div class="link_div_large">Thumbnail</div>
+                            <div class="link_div_small">Pair</div>
+                            <div class="link_div_small">Active</div>
+                            <div class="link_div_small">Delete</div>
+                        </div>
+                        <div is="link-item"
+                             v-for="(link,index) in cannotlink_list"
+                             v-bind:key="link.id"
+                             v-bind:link="link"
+                             v-on:remove="remove(link,index,'cannot')"
+                             v-on:change="change(link)"
+                             v-on:over="mouseOver(link)"
+                             v-on:leave="mouseLeave(link)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div id="parallel_container" class="col-lg-12 panel panel-info panel_content container_bottom" style="height: 224px">
+            <div class="title" style="height: 40px;font-size: 30px;line-height: 40px;">PARALLEL COORDINATES</div>
+            <div id="parallel_view" style="height: 80%;">
+                <svg id="parallel_view_plot"></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    Vue.component('train-para-item', {
+        template: '\
+        <div class="col-lg-12 input-group para_item" style="padding-left:10px;padding-right:10px;">\
+            <div class="input-group-addon param_span" style="text-align:left;padding-left:5px;color: #333;">{{parameter.name}}</div>\
+            <input class="form-control param_input" v-bind:class="input_class" \
+            type="number" :step="parameter.step" :max="parameter.max" :min="parameter.min" \
+            style="width:100px;float:right;margin-right:20px" \
+            v-model="parameter.value" v-on:input="change_projected_state" :title="title_content">\
+        </div>',
+        props: ['parameter', 'projected_state'],
+
+        computed: {
+            input_class: function () {
+                return {
+                    param_lock: this.projected_state,
+                }
+            },
+            title_content: function () {
+                if (this.projected_state == 0) return "";
+                else if (this.projected_state == 1) return "re embedding";
+            }
+        },
+        methods: {
+            change_projected_state: function () {
+                para_object.projected_state = 0
+            },
+
+        }
+    })
+    Vue.component('project-para-item', {
+        template: '\
+        <div class="col-lg-12 input-group para_item" style="padding-left:10px;padding-right:10px;">\
+            <div class="input-group-addon param_span" style="text-align:left;padding-left:5px;color: #333;!important">{{parameter.name}}</div>\
+            <input class="form-control param_input" type="number" :step="parameter.step" :max="parameter.max" :min="parameter.min" style="width:100px;float:right;margin-right:20px" v-model="parameter.value" >\
+        </div>',
+        props: ['parameter']
+    })
+
+    Vue.component('dataset-item', {
+        template: '\<li v-on:click="$emit(\'change\')"><a href="#">{{dataset.name}}-{{dataset.num}}*{{dataset.dim}}-{{dataset.type}}</a></li>',
+        props: ['dataset']
+    })
+    Vue.component('link-item', {
+        template: '\
+        <div class="link_div_item"  @mouseover="$emit(\'over\')" @mouseleave="$emit(\'leave\')" >\
+        <div class="link_div_small">{{link.index}}</div>\
+        <div class="link_div_large"><svg :id="link.index"></svg></div>\
+        <div class="link_div_small">({{link.head}},{{link.tail}})</div>\
+        <div class="link_div_small">\
+            <template>\
+            <el-checkbox v-model="link.active" @change="active_change(link)"></el-checkbox>\
+            </template>\
+        </div>\
+        <div class="link_div_small">\
+            <i class="el-icon-delete" style="font-size:125%" v-on:click="$emit(\'remove\')"></i>\
+        </div>\
+        </div>',
+        props: ['link'],
+        methods: {
+            active_change: function (link) {
+                let head = link.head;
+                let tail = link.tail;
+                {#console.log(link.active);#}
+                if (link.active == 1) {
+                    linkModel.active_link(link)
+                } else if (link.active == 0) {
+                    linkModel.not_active_link(link)
+                }
+            }
+        }
+    })
+
+    var data_object = new Vue({
+        data: {
+            data: "",
+            label: "",
+            low_data: "",
+            attrs: "",
+        }
+    })
+
+    var link_object = new Vue({
+        el: '#link_container',
+
+        data: {
+            index: 1,
+            mustlink_index: 1,
+            cannotlink_index: 1,
+            mustlink_list: [],
+            cannotlink_list: [],
+            link_ids: []
+        },
+        methods: {
+            addMustLink: function (inputs) {
+                this.mustlink_list.push({
+                    selected: false,
+                    id: this.index,
+                    index: "M" + this.mustlink_index,
+                    head: inputs[0],
+                    tail: inputs[1],
+                    boardcast: false,
+                    active: true
+                })
+
+                linkModel.draw_link_pipeline([inputs[0], inputs[1], true], 'must');
+
+                this.index += 1;
+                this.mustlink_index += 1;
+                sleep(0).then(() => {
+                    contourModel.draw_contour("#M" + (this.mustlink_index - 1), inputs)
+                })
+            },
+            addCannotLink: function (inputs) {
+                this.cannotlink_list.push({
+                    selected: false,
+                    id: this.index,
+                    index: "C" + this.cannotlink_index,
+                    head: inputs[0],
+                    tail: inputs[1],
+                    boardcast: false,
+                    active: true
+                })
+
+                linkModel.draw_link_pipeline([inputs[0], inputs[1], true], 'cannot');
+                this.index += 1;
+                this.cannotlink_index += 1;
+                sleep(0).then(() => {
+                    contourModel.draw_contour("#C" + (this.cannotlink_index - 1), inputs)
+                })
+            },
+            get_mustlink_id: function () {
+                let res = []
+                for (let i = 0; i < this.mustlink_list.length; i++) {
+
+                    if (this.mustlink_list[i].active == false) continue;
+                    res.push(this.mustlink_list[i].head)
+                    res.push(this.mustlink_list[i].tail)
+                }
+                return res
+            },
+            get_cannotlink_id: function () {
+                let res = []
+                for (let i = 0; i < this.cannotlink_list.length; i++) {
+
+                    if (this.cannotlink_list[i].active == false) continue;
+                    res.push(this.cannotlink_list[i].head)
+                    res.push(this.cannotlink_list[i].tail)
+                }
+                return res
+            },
+            getLinkID: function () {
+
+                this.link_ids = []
+                let mustlink_id = this.get_mustlink_id()
+                let cannotlink_id = this.get_cannotlink_id()
+                this.link_ids = mustlink_id.concat(cannotlink_id)
+            },
+            restoreMustLink: function (inputs) {
+
+                this.mustlink_list.forEach(function (item) {
+
+                    item.active = 0;
+                    contourModel.draw_contour("#" + item.index, [item.head, item.tail])
+                })
+            },
+            restoreCannotLink: function (inputs) {
+
+                this.cannotlink_list.forEach(function (item) {
+
+                    item.active = 0;
+                    contourModel.draw_contour("#" + item.index, [item.head, item.tail])
+                })
+            },
+            getAllLinks: function () {
+                let a = this.mustlink_list
+                let b = this.cannotlink_list
+                return a.concat(b)
+            },
+            remove: function (link, index, link_type) {
+                if (link_type == 'must') {
+                    this.mustlink_list.splice(index, 1)
+                } else {
+                    this.cannotlink_list.splice(index, 1)
+                }
+                linkModel.delete_link(link)
+            },
+            clear: function () {
+                this.mustlink_list.splice(0, this.mustlink_list.length);
+                this.cannotlink_list.splice(0, this.cannotlink_list.length)
+            },
+            mouseOver: function (link) {
+                linkModel.highlight_link(link);
+            },
+            mouseLeave: function (link) {
+                linkModel.not_highlight_link(link);
+            }
+        }
+    })
+
+    var para_object = new Vue({
+        el: '#control_div_content',
+        data: {
+            dataset_list: [
+            ],
+            selected_dataset_name: "",
+            selected_dataset_num: "",
+            selected_dataset_dim: "",
+            selected_dataset_type: "",
+            projected_state: 0,
+            train_para: [
+                {index: 0, name: "Training epoch", value: 400, step: 20, max: 1000, min: 50},
+                {index: 1, name: "Neighbor Num", value: 15, step: 1, max: 100, min: 1},
+            ],
+            project_para: [
+                {index: 3, name: "Upper bound", value: 0.11, step: 0.01, max: 1, min: 0},
+                {index: 5, name: "Fine-tune epoch", value: 30, step: 5, max: 1000, min: 5},
+                {index: 6, name: "Must Link Strength", value: 0.3, step: 0.1, max: 1, min: 0},
+                {index: 7, name: "Cannot Link Strength", value: 0.3, step: 0.1, max: 1, min: 0},
+            ],
+        },
+        methods: {
+            all_clear: function () {
+
+                d3.select("#project_view_scatter").selectAll('line').remove()
+                d3.selectAll("circle").attr("stroke", "")
+
+                link_object.clear()
+
+                scatterModel1.lasso_ids = []
+
+                para_object.projected_state=0
+                project_object.picture_state = false
+                project_object.mustlink_state = false
+                project_object.cannotlink_state = false
+            },
+            half_clear: function () {
+
+                scatterModel1.lasso_ids = []
+
+                project_object.picture_state = false
+                project_object.mustlink_state = false
+                project_object.cannotlink_state = false
+            },
+            change_dataset: function (dataset) {
+                for (let i = 0; i < this.dataset_list.length; i++) {
+                    if (this.dataset_list[i].name == dataset) {
+                        this.selected_dataset_num = this.dataset_list[i].num
+                        this.selected_dataset_dim = this.dataset_list[i].dim
+                        this.selected_dataset_type = this.dataset_list[i].type
+                    }
+                }
+                this.all_clear()
+            },
+            project: function () {
+
+                const MUST_LINK = 1;
+                const CANNOT_LINK = 0;
+                const SPREAD = 1;
+                const UN_SPREAD = 0;
+                const ACTIVE = 1;
+                const INACTIVE = 0;
+                let alpha = 5;
+                let split_lower = 0.01;
+
+                if (this.projected_state == 0) {
+                    this.all_clear()
+                    let parameters_to_send = {
+                        "dataset": this.selected_dataset_name,
+                        "input_dims": this.selected_dataset_dim,
+                        "n_samples": this.selected_dataset_num,
+                        "epoch_nums": this.train_para[0].value,
+                        "n_neighbors": this.train_para[1].value,
+                        "alpha": alpha,
+                        "split_upper": this.project_para[0].value,
+                        "split_lower": split_lower,
+                    }
+                    ajax_for_get_projection("train_for_vis", parameters_to_send)
+                    this.projected_state = 1 - this.projected_state
+                } else if (this.projected_state == 1) {
+                    this.half_clear()
+
+                    let must_links = link_object.mustlink_list;
+                    let cannot_links = link_object.cannotlink_list;
+                    let ml_num = must_links.length;
+                    let cl_num = cannot_links.length;
+                    let all_links = Array();
+                    let link_spreads = Array();
+
+                    console.log(must_links);
+                    console.log(cannot_links);
+
+                    for (let i = 0; i < ml_num + cl_num; i++) {
+                        let cur_obj;
+                        let type;
+                        if (i < ml_num) {
+                            cur_obj = must_links[i];
+                            type = MUST_LINK;
+                        } else {
+                            cur_obj = cannot_links[i - ml_num];
+                            type = CANNOT_LINK;
+                        }
+
+                        console.log(cur_obj);
+
+                        let uuid = cur_obj.id;
+                        let head = cur_obj.head;
+                        let tail = cur_obj.tail;
+                        let active = cur_obj.active ? ACTIVE : INACTIVE;
+                        let spread = cur_obj.boardcast ? SPREAD : UN_SPREAD;
+                        all_links.push([uuid, head, tail, type, active])
+                        link_spreads.push(spread)
+                    }
+
+                    let alpha = 5;
+                    let split_lower = 0.007;
+
+                    let parameters_to_send = {
+                        "dataset": para_object.selected_dataset_name,
+                        "input_dims": para_object.selected_dataset_dim,
+                        "n_samples": this.selected_dataset_num,
+                        "epoch_nums": para_object.train_para[0].value,
+                        "n_neighbors": para_object.train_para[1].value,
+                        "alpha": alpha,
+                        "split_upper": para_object.project_para[0].value,
+                        "split_lower": split_lower,
+                        "finetune_epochs": para_object.project_para[1].value,
+                        "ml_strength": para_object.project_para[2].value,
+                        "cl_strength": para_object.project_para[3].value,
+                        "links": JSON.stringify(all_links),
+                        "link_spreads": JSON.stringify(link_spreads),
+                    }
+                    ajax_for_get_projection2("constraint_resume", parameters_to_send, scatterModel1)
+
+                }
+
+            },
+        },
+        computed: {}
+    })
+
+    var project_object = new Vue({
+        el: '#project_container',
+        data: {
+            picture_width: 40,
+            picture_height: 40,
+            picture_state: false,
+            mustlink_state: false,
+            cannotlink_state: false,
+        },
+        methods: {
+            change_picture: function () {
+                scatterModel1.draw_pipeline(scatterModel1.result);
+                link_object.restoreMustLink()
+                link_object.restoreCannotLink()
+            },
+            change_mustlink_state: function () {
+                this.mustlink_state = !this.mustlink_state
+                this.cannotlink_state = false
+                scatterModel1.call_mode()
+            },
+            change_cannotlink_state: function () {
+                this.cannotlink_state = !this.cannotlink_state
+                this.mustlink_state = false
+                scatterModel1.call_mode()
+            },
+            project: function () {
+                para_object.project()
+            }
+        },
+        computed: {
+            mustlink_class: function () {
+                return {
+                    button_selected: this.mustlink_state,
+                    button_not_selected: !this.mustlink_state
+                }
+            },
+            cannotlink_class: function () {
+                return {
+                    button_selected: this.cannotlink_state,
+                    button_not_selected: !this.cannotlink_state
+                }
+            },
+            judge_point: function () {
+                if (para_object.selected_dataset_type === 'image') return false
+                else return true
+            }
+        }
+    })
+
+    function sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+</script>
+<script src="static/js/models/ContourModel.js"></script>
+<script src="static/js/models/NewScatterModel.js"></script>
+<script src="static/js/utils.js"></script>
+<script src="static/js/models/LinkModel.js"></script>
+<script src="static/js/models/ParallelModel.js"></script>
+<script src="static/js/main.js"></script>
+</body>
+</html>

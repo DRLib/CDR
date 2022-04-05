@@ -1,0 +1,19 @@
+exp_params:
+  dataset: "usps"
+  input_dims: 256   # (28, 28, 1)
+  LR: 0.001
+  batch_size: 512
+  n_neighbors: 15
+  optimizer: "adam" # adam or sgd
+  scheduler: "multi_step" # cosine or multi_step or on_plateau
+  temperature: 0.15
+  gradient_redefine: True
+  separate_upper: 0.1
+  separation_begin_ratio: 0.25
+  steady_begin_ratio: 0.875
+
+training_params:
+  epoch_nums: 1000
+  epoch_print_inter_ratio: 0.1
+  val_inter_ratio: 1
+  ckp_inter_ratio: 1

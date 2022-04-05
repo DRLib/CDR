@@ -1,0 +1,58 @@
+#control_div_content{
+    height: 95%;
+}
+.control_div{
+    margin: 0px;
+    margin-bottom: 8px;
+}
+.ds_info{
+    padding: 5px;
+    font-size: 22px;
+    color: rgb(42, 42, 42);
+    margin-bottom: 5px;
+}
+.para_item{
+    height: 55px;
+    margin: 21px 0px 21px 0px;
+}
+.control_btn{
+    width: 100px;
+    font-size: 16px;
+    height: 30px;
+    margin-left: 10px;
+    line-height: 30px;
+    padding:0;
+}
+.param_span, .param_input{
+    height: 43.5px;
+    font-size: 10px;
+    padding: 2px 4px;
+}
+.param_span{
+    width: 200px;
+    font-size: 24px;
+    background-color: #fdfdfd;
+    color: #333;
+}
+.param_input{
+    width: 90px;
+    display: inline;
+    padding-left: 10px;
+}
+.param_lock{
+    background-color: rgba(239, 239, 239, 0.3);
+    color:#bcbcc0
+}
+.dataset_ul{
+    width: 210px;
+}
+.panel_title_info{
+    font-size: 30px;
+}
+.panel_heading_info{
+    height: 40px;
+}
+.el-input__inner{
+    font-size: 20px;!important;
+    height: 50px;
+}
