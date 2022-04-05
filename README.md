@@ -5,7 +5,7 @@
 
 ## Environment setup
 
-This project was based on `python 3.6 and pytorch 1.6.0`. See `requirements.txt` for all prerequisites, and you can also install them using the following command.
+This project was based on `python 3.6 and pytorch 1.7.0`. See `requirements.txt` for all prerequisites, and you can also install them using the following command.
 
 ```bash
 pip install -r requirements.txt
