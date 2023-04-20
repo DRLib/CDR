@@ -86,5 +86,16 @@ After that, the prototype interface can be found in [http://127.0.0.1:5000](http
 
 ![frontend_07](prototype.png)
 
-[comment]: <> "## Cite"
-
+## Cite
+```bash
+@article{xia2022interactive,
+  title={Interactive visual cluster analysis by contrastive dimensionality reduction},
+  author={Xia, Jiazhi and Huang, Linquan and Lin, Weixing and Zhao, Xin and Wu, Jing and Chen, Yang and Zhao, Ying and Chen, Wei},
+  journal={IEEE Transactions on Visualization and Computer Graphics},
+  volume={29},
+  number={1},
+  pages={734--744},
+  year={2022},
+  publisher={IEEE}
+}
+```
